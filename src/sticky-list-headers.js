@@ -34,7 +34,8 @@
 					
 					div.appendChild(header.cloneNode(true));
 					
-					header.setAttribute('style', header.getAttribute('style') + "filter:alpha(opacity=0); opacity:0;");
+					var style = header.getAttribute('style') || "";
+					header.setAttribute('style', style + "filter:alpha(opacity=0); opacity:0;");
 					
 					
 					var style = "position: absolute; width: 100%;"
