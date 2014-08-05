@@ -59,7 +59,7 @@
 	swlStickyListHeadersProto.calculateOffsets = function() {
 		this.swlHeaders.forEach(function(header, i) {
 			//this.shadowRoot.querySelector('div[data-offset-top]:nth-of-type('+(i+1)+')').setAttribute('data-offset-top', header.offsetTop);
-			this.shadowRoot.querySelectorAll('div[data-offset-top]')[i+1].setAttribute('data-offset-top', header.offsetTop);
+			this.shadowRoot.querySelectorAll('div[data-offset-top]')[i].setAttribute('data-offset-top', header.offsetTop);
 		}.bind(this));
 	}
 	swlStickyListHeadersProto.scroll = function() {
