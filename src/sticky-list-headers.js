@@ -150,7 +150,6 @@ swlStickyListHeadersProto.getHeaderOfElement = function(ele) {
 	return null;
 }
 swlStickyListHeadersProto.refresh = function() {
-	console.log("hello");
 	this.swlHeaderSelector = this.getAttribute('selector');
 	this.attachedCallback();
 }
