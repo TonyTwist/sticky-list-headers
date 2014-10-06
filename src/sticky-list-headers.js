@@ -9,8 +9,8 @@ var swlStickyListHeadersProto = Object.create(HTMLDivElement.prototype, {
 				}
 			}
 			this.createShadowRoot();
-			//this.shadowRoot.resetStyleInheritance = true; // <-- get rid of anything inherited
-			//root.applyAuthorStyles = true;
+			this.shadowRoot.resetStyleInheritance = false; // <-- get rid of anything inherited
+			this.shadowRoot.applyAuthorStyles = true; // <-- deprecated but need to add 'cause applying parent style
 			
 			this.shadowRoot.appendChild(document.createElement('content'));
 			
@@ -42,9 +42,17 @@ var swlStickyListHeadersProto = Object.create(HTMLDivElement.prototype, {
 				}
 				
 				var div = document.createElement('div');
-				div.appendChild(header.cloneNode(true));
+				//div.appendChild(header.cloneNode(true));
+				div.appendChild(this.cloneMassive(header));
 				
-				header.setAttribute('style', style + "opacity:0;");
+				//var clone = div.querySelector(':last-child');
+				
+				
+				if(header.style.hasOwnProperty('opacity')) {
+					header.style.opacity = 0;
+				} else {
+					header.setAttribute('style', style + "opacity:0;");
+				}
 				
 				
 				var style = "position: absolute; width: 100%;"
@@ -55,12 +63,13 @@ var swlStickyListHeadersProto = Object.create(HTMLDivElement.prototype, {
 				
 				this.shadowRoot.appendChild(div);
 			}.bind(this));
+			
 		}
 	},
 	attributeChangedCallback: {
 		value: function(attrName, oldVal, newVal) {
 			if(attrName == 'selector') {
-				this.refresh();
+				this.rebuild();
 			}
 		}
 	}
@@ -149,12 +158,45 @@ swlStickyListHeadersProto.getHeaderOfElement = function(ele) {
 	}
 	return null;
 }
-swlStickyListHeadersProto.refresh = function() {
+swlStickyListHeadersProto.rebuild = function() {
 	this.swlHeaderSelector = this.getAttribute('selector');
 	this.attachedCallback();
+}
+swlStickyListHeadersProto.refresh = function() {
+	this.calculateOffsets();
+}
+swlStickyListHeadersProto.cloneMassive = function(node) {
+	var clone = node.cloneNode(false);
+	
+	if(!clone.hasOwnProperty('swlOriginal')) {
+		Object.defineProperty(clone, 'swlOriginal', {
+			value: node
+		});
+	}
+	
+	if(!node.hasOwnProperty('swlClone')) {
+		Object.defineProperty(node, 'swlClone', {
+			value: clone
+		})
+	}
+	
+	// overwrite node event listener
+	var listener = node.__proto__.addEventListener;
+	node.addEventListener = function(type, handler, useCapture) {
+		// and bind the orginial node to the handler
+		return listener.call(clone, type, handler.bind(node), useCapture);
+	}
+	
+	for(var i = 0; i < node.childNodes.length; i++) {
+		clone.appendChild(this.cloneMassive(node.childNodes[i]));
+	}
+	
+	return clone;
+	
 }
 
 var SwlStickyListHeaders = document.registerElement('swl-sticky-list-headers', {
 	prototype: swlStickyListHeadersProto,
 	extends: 'div'
 });
+
