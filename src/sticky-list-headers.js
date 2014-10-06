@@ -186,6 +186,23 @@ swlStickyListHeadersProto.cloneMassive = function(node) {
 		})
 	}
 	
+	// create an observer instance
+	var observer = new MutationObserver(function(mutations) {
+		mutations.forEach(function(mutation) {
+			if(mutation.type === "attributes") {
+				if(mutation.attributeName === "class") {
+					Array.prototype.slice.call(clone.classList).forEach(function(cls, i) {
+						clone.classList.remove(cls);
+					});
+					Array.prototype.slice.call(node.classList).forEach(function(cls, i) {
+						clone.classList.add(cls);
+					});
+				}
+			}
+		});
+	});
+	observer.observe(node, { attributes: true });
+	
 	// overwrite node event listener
 	var addListener = node.__proto__.addEventListener;
 	node.addEventListener = function(type, listener, useCapture) {
