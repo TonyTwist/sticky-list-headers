@@ -174,6 +174,12 @@ swlStickyListHeadersProto.cloneMassive = function(node) {
 		});
 	}
 	
+	if(!clone.hasOwnProperty('swlListeners')) {
+		Object.defineProperty(clone, 'swlListeners', {
+			value: []
+		});
+	}
+	
 	if(!node.hasOwnProperty('swlClone')) {
 		Object.defineProperty(node, 'swlClone', {
 			value: clone
@@ -181,11 +187,30 @@ swlStickyListHeadersProto.cloneMassive = function(node) {
 	}
 	
 	// overwrite node event listener
-	var listener = node.__proto__.addEventListener;
-	node.addEventListener = function(type, handler, useCapture) {
+	var addListener = node.__proto__.addEventListener;
+	node.addEventListener = function(type, listener, useCapture) {
 		// and bind the orginial node to the handler
-		return listener.call(clone, type, handler.bind(node), useCapture);
+		var binded = listener.bind(node);
+		clone.swlListeners.push({
+			listener: listener,
+			binded: binded,
+			type: type
+		});
+		
+		return addListener.call(clone, type, binded, useCapture);
 	}
+	
+	var removeListener = node.__proto__.removeEventListener;
+	node.removeEventListener = function(type, listener, useCapture) {
+		var binded = listener;
+		for(var i = 0; i < clone.swlListeners.length; i++) {
+			if(clone.swlListeners[i].type === type && clone.swlListeners[i].listener === listener) {
+				binded = clone.swlListeners[i].binded;
+			}
+		}
+		return removeListener.call(clone, type, binded, useCapture);
+	}
+	
 	
 	for(var i = 0; i < node.childNodes.length; i++) {
 		clone.appendChild(this.cloneMassive(node.childNodes[i]));
