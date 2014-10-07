@@ -72,6 +72,17 @@ var swlStickyListHeadersProto = Object.create(HTMLDivElement.prototype, {
 				this.rebuild();
 			}
 		}
+	},
+	rebuild: {
+		value: function() {
+			this.swlHeaderSelector = this.getAttribute('selector');
+			this.attachedCallback();
+		}
+	},
+	refresh: {
+		value: function() {
+			this.calculateOffsets();
+		}
 	}
 });
 swlStickyListHeadersProto.checkWindowSize = function(evt) {
@@ -158,32 +169,34 @@ swlStickyListHeadersProto.getHeaderOfElement = function(ele) {
 	}
 	return null;
 }
-swlStickyListHeadersProto.rebuild = function() {
-	this.swlHeaderSelector = this.getAttribute('selector');
-	this.attachedCallback();
-}
-swlStickyListHeadersProto.refresh = function() {
-	this.calculateOffsets();
-}
 swlStickyListHeadersProto.cloneMassive = function(node) {
 	var clone = node.cloneNode(false);
 	
 	if(!clone.hasOwnProperty('swlOriginal')) {
 		Object.defineProperty(clone, 'swlOriginal', {
+			writable: true,
 			value: node
 		});
+	} else {
+		clone.swlOriginal = node;
 	}
 	
 	if(!clone.hasOwnProperty('swlListeners')) {
 		Object.defineProperty(clone, 'swlListeners', {
+			writable: true,
 			value: []
 		});
+	} else {
+		clone.swlListeners = [];
 	}
 	
 	if(!node.hasOwnProperty('swlClone')) {
 		Object.defineProperty(node, 'swlClone', {
+			writable: true,
 			value: clone
 		})
+	} else {
+		node.swlClone = clone;
 	}
 	
 	// create an observer instance
@@ -197,6 +210,10 @@ swlStickyListHeadersProto.cloneMassive = function(node) {
 					Array.prototype.slice.call(node.classList).forEach(function(cls, i) {
 						clone.classList.add(cls);
 					});
+				} else {
+					if(mutation.attributeName !== 'style') {
+						clone.setAttribute(mutation.attributeName, node.getAttribute(mutation.attributeName));
+					}
 				}
 			}
 		});
