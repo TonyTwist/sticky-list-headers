@@ -10,7 +10,7 @@ var swlStickyListHeadersProto = Object.create(HTMLDivElement.prototype, {
 			}
 			this.createShadowRoot();
 			this.shadowRoot.resetStyleInheritance = false; // <-- get rid of anything inherited
-			this.shadowRoot.applyAuthorStyles = true; // <-- deprecated but need to add 'cause applying parent style
+			//this.shadowRoot.applyAuthorStyles = true; // <-- deprecated but need to add 'cause applying parent style
 			
 			this.shadowRoot.appendChild(document.createElement('content'));
 			
@@ -159,28 +159,6 @@ swlStickyListHeadersProto.scrollToElement = function(ele) {
 	} else {
 		ele.parentNode.scrollTop = ele.offsetTop - parseInt(style.marginTop);
 	}
-<<<<<<< HEAD
-	swlStickyListHeadersProto.scrollToElement = function(ele) {
-		var style =  ele.currentStyle || window.getComputedStyle(ele);
-		var header = this.getHeaderOfElement(ele);
-		if(header) {
-			var headerStyle = header.currentStyle || window.getComputedStyle(header);
-			ele.parentNode.scrollTop = ele.offsetTop - header.offsetHeight - parseInt(style.marginTop) - parseInt(headerStyle.marginTop);
-		} else {
-			ele.parentNode.scrollTop = ele.offsetTop - parseInt(style.marginTop);
-		}
-	}
-	swlStickyListHeadersProto.getHeaderOfElement = function(ele) {
-		var children = Array.prototype.slice.call(ele.parentNode.children);
-		for(var i = 0; i < this.swlHeaders.length; i++) {
-			if(children.indexOf(this.swlHeaders[i]) > children.indexOf(ele)) {
-				return this.swlHeaders[i-1];
-			}
-		}
-		return null;
-	}
-	
-=======
 }
 swlStickyListHeadersProto.getHeaderOfElement = function(ele) {
 	var children = Array.prototype.slice.call(ele.parentNode.children);
@@ -193,7 +171,6 @@ swlStickyListHeadersProto.getHeaderOfElement = function(ele) {
 }
 swlStickyListHeadersProto.cloneMassive = function(node) {
 	var clone = node.cloneNode(false);
->>>>>>> a3b27df9a6dbf70abe652e4a0fe0469c01f444e6
 	
 	if(!clone.hasOwnProperty('swlOriginal')) {
 		Object.defineProperty(clone, 'swlOriginal', {
